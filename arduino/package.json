@@ -1,8 +1,8 @@
 {
-  "name": "display-3-colors",
+  "name": "hackathon",
   "version": "1.0.0",
-  "description": "First LED strip test",
-  "main": "simplecolors.js",
+  "description": "Basic LED control",
+  "main": "hackathon.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

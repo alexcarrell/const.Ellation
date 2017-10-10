@@ -13,7 +13,7 @@ var fps = 2; // how many frames per second do you want to try?
 //const LED_URL = "http://localhost:5000/api/Xyz";
 const LED_URL = "http://10.10.10.87/api/activeled/";
 
-var led = 8;
+var led = 1;
 var ledChanged = true;
 
 function getCurrentLed() {
