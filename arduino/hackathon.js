@@ -21,14 +21,19 @@ function getCurrentLed() {
 }
 
 function setCurrentLed(newLed) {
-    if (newLed != led) {
+    if (parseInt(newLed) != parseInt(led)) {
+        console.log(newLed + ' is different from ' + led);
         led = newLed;
         ledChanged = true;
     }
 }
 
 function prepareForNewLed() {
-
+    console.log('led changed');
+    for(var i = 0; i < strip.length; i++) {
+        strip.pixel( i ).color( "rgb(0, 10, 0)" );
+    }
+    strip.show();
 }
 
 function lookupNewLed() {
@@ -38,11 +43,11 @@ function lookupNewLed() {
         if (response.body) {
             try {
                 temp = new Number(response.body);
-                console.log("Temp: "+temp);
+                //console.log("Temp: "+temp);
                 if (temp >= 0 && temp <= 173) {
-                    led = temp;
+                    setCurrentLed(temp);
                 }
-                console.log("Temp: "+led);
+                //console.log("Temp: "+led);
             } catch (e) {
                 console.log("I caught an error: " + e.message);
             }
@@ -78,20 +83,22 @@ board.on("ready", function() {
 
             if (ledChanged) {
                 prepareForNewLed();
+                ledChanged = false;
+            } else {
+
+                for(var i = 0; i < 174; i++) {
+                    strip.pixel(i).off();
+                }
+    
+                if (!pixelWasOn) {
+                    strip.pixel(getCurrentLed()).color("rgb(0, 100, 0)");
+                }
+    
+                strip.show();
+    
+                //console.log('was on? ' + pixelWasOn);
+                pixelWasOn = !pixelWasOn;
             }
-
-            for(var i = 0; i < 174; i++) {
-                strip.pixel(i).off();
-            }
-
-            if (!pixelWasOn) {
-                strip.pixel(getCurrentLed()).color("rgb(0, 100, 0)");
-            }
-
-            strip.show();
-
-            //console.log('was on? ' + pixelWasOn);
-            pixelWasOn = !pixelWasOn;
 
         }, 1000/fps);
     });
