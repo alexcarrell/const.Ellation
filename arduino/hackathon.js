@@ -22,7 +22,7 @@ function getCurrentLed() {
 
 function setCurrentLed(newLed) {
     if (parseInt(newLed) != parseInt(led)) {
-        console.log(newLed + ' is different from ' + led);
+        console.log('current led changed');
         led = newLed;
         ledChanged = true;
     }
@@ -31,7 +31,7 @@ function setCurrentLed(newLed) {
 function prepareForNewLed() {
     console.log('led changed');
     for(var i = 0; i < strip.length; i++) {
-        strip.pixel( i ).color( "rgb(0, 10, 0)" );
+        strip.pixel( i ).color( "rgb(0, 50, 0)" );
     }
     strip.show();
 }
@@ -39,7 +39,7 @@ function prepareForNewLed() {
 function lookupNewLed() {
     got(LED_URL)
     .then(response => {
-        console.log("API call finished with response: "+response.body);
+        //console.log("API call finished with response: "+response.body);
         if (response.body) {
             try {
                 temp = new Number(response.body);
