@@ -8,10 +8,10 @@
 }
 
 .App-logo-plain {
-  height: 80px;
   position:fixed;
-  right: 0px;
-  bottom: 0px
+  height: 250px;
+  right: -40px;
+  bottom: -40px
 }
 
 .App-header {
@@ -23,11 +23,9 @@
 
 .App-footer {
   background-color: #0090E3;
+  position:fixed;
   height: 150px;
   padding: 0px;
-  color: white;
-  position:fixed;
-  bottom: 10px
 }
 .App-title {
   font-size: 1.5em;
@@ -35,6 +33,11 @@
 
 .App-intro {
   font-size: large;
+}
+
+.App-currentItem{
+  font-size: 150%;
+  font-style: bold;
 }
 
 @keyframes App-logo-spin {

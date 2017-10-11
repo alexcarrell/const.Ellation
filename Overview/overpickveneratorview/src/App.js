@@ -12,16 +12,53 @@ var obj = {
 
 class List extends Component {
   render(){
+    console.log(this.props.currentItem);
+    var self = this;
     if (this.props.items) {   return (
       <ul>
       {
         this.props.items.map(function(item) {
-          return <li key={item}>{item}</li>
+          console.log(self.props.currentItem)
+          return (item === self.props.currentItem) ?
+                      <li className='App-currentItem' key={item}>{item}</li>
+                    : <li key={item}>{item}</li>
         })
        }
       </ul>
-	); } else { return  ("None") }
+	   ); } else { return  ("None") }
+
   }
+}
+
+class Pickers extends Component {
+  constructor(props) {
+      super(props);
+      this.state = {
+      items: ["picker1"],
+      currentPicker: ""
+     };
+  }
+}
+
+class ListPickers extends Component {
+  render(){
+    console.log(this.props.currentItem);
+    var self = this;
+    if (this.props.items) {   return (
+      <ul>
+      {
+        this.props.items.map(function(item) {
+          console.log(self.props.currentItem)
+          return (item === self.props.currentItem) ?
+                      <li className='App-currentItem' key={item}>{item}</li>
+                    : <li key={item}>{item}</li>
+        })
+       }
+      </ul>
+	   ); } else { return  ("None") }
+
+  }
+
 }
 
 
@@ -29,28 +66,44 @@ class App extends Component {
 	  constructor(props) {
         super(props);
         this.state = {
-        items: ['NONE'],
-        currentItem: ''
+        items: ["NONE"],
+        currentItem: ""
       };
   }
 
   filterList(event){
-    var updatedList = this.state.initialItems;
+    var updatedList = this.state.items;
     updatedList = updatedList.filter(function(item){
       return item.toLowerCase().search(event.target.value.toLowerCase()) !== -1;
     });
-    this.setState({items: updatedList});
+    this.setState({items: this.state.items});
   }
 
 	getInitialState(){
      return {
        initialItems: [
-       'NONE'],
+       "NONE"],
       }
-
    }
 
-   Getfunction() {
+  reponseStatus = (value, a, b) => {
+     if (value == 0){
+       return a;
+     } else
+     {
+       return b
+     }
+  }
+
+   FetchCurrent() {
+     var self = this;
+     console.log("FetchCurrent");
+     this.setState((prevState, props) => ({
+         currentItem: this.reponseStatus( 1, "NONE", "Bosch 123")
+         }));
+    console.log(this.state.currentItem);
+    return this.state.currentItem
+     /*
      fetch(`http://10.10.10.87/api/activeled`, {
        mode: 'no-cors',
        method: 'GET',
@@ -61,8 +114,9 @@ class App extends Component {
       console.log(response.headers);    //=> Headers
       console.log(response.url);        //=> String
       console.log(response.text);
-      let newItems = [];
-      if (response.status == 0) { newitems: ['NONE'];} else {newitems: [response.text]; }
+      var newItems = this.reponseStatus(response.status, ['NONE'], [response.text]);
+      console.log('Getfunction');
+      console.log(newItems);
       this.setState((prevState, props) => ({
           items: newItems
       }));
@@ -72,6 +126,41 @@ class App extends Component {
     , function(error) {
       console.log(error.message); //=> String
     })
+    */
+  }
+
+  FetchPickList() {
+    var newItems = this.reponseStatus(1, [], ['Hollow Tech ABC','Bosch 123','Samsung abc']);
+    console.log('FetchPickList');
+    console.log(newItems);
+    this.setState((prevState, props) => ({
+        items: newItems
+        }));
+   return 'Hollow'
+    /*
+    fetch(`http://10.10.10.87/api/ShowPicklists`, {
+      mode: 'no-cors',
+      method: 'GET',
+      headers: {'Content-Type': 'application/text'}
+  }).then(function(response) {
+     console.log(response.status);     //=> number 100–599
+     console.log(response.statusText); //=> String
+     console.log(response.headers);    //=> Headers
+     console.log(response.url);        //=> String
+     console.log(response.text);
+     var newItems = this.reponseStatus(response.status, ['NONE'], [response.text]);
+     console.log('Getfunction');
+     console.log(newItems);
+     this.setState((prevState, props) => ({
+         items: newItems
+     }));
+
+     return response.text()
+   }
+   , function(error) {
+     console.log(error.message); //=> String
+   })
+   */
   }
 
    componentDidMount() {
@@ -82,6 +171,14 @@ class App extends Component {
                 console.log(result);
             });
             */
+    }
+
+    RefreshButtonClick() {
+      console.log("RefreshButtonClick");
+      this.FetchPickList();
+      console.log("this.FetchPickList");
+      this.FetchCurrent();
+      this.forceUpdate()
     }
 
   render() {
@@ -95,19 +192,18 @@ class App extends Component {
           Currently Picking.
         </p>
 					<div>
-					<button className = "pressMe"
-                    onClick = { () => this.Getfunction() }>
-
+					  <button className = "pressMe"
+                    onClick = { () => this.RefreshButtonClick() }>
               Refresh
-          </button>
-					<List items={this.state.items}/>
-						<input type="text" placeholder="Search" onChange={this.filterList}/>
+            </button>
 
+					  <List items={this.state.items}/>
+					  <input type="text" placeholder="Search" onChange={this.filterList}/>
 
 					</div>
 
           <div className="App-footer">
-            <img src={logo} className="App-plain" alt="logo" />
+            <img src={logo} className="App-logo-plain" alt="logo" />
           </div>
         </div>
     );
