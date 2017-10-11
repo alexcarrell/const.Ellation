@@ -8,43 +8,49 @@ opts.port = process.argv[2] || "";
 var board = new five.Board(opts);
 var strip = null;
 
-var fps = 2; // how many frames per second do you want to try?
+var fps = 2; // Frames per Second
 
-//const LED_URL = "http://localhost:5000/api/Xyz";
 const LED_URL = "http://10.10.10.87/api/activeled/";
+const FEEDBACK_COLOR = "rgb(0, 50, 0)";
+const BLINK_COLOR = "rgb(0, 150, 150)";
 
-var led = 1;
+var led = 0;
 var ledChanged = true;
 
+// Getter and Setter for the current LED
 function getCurrentLed() {
     return led;
 }
-
 function setCurrentLed(newLed) {
-    if (newLed != led) {
+    if (parseInt(newLed) != parseInt(led)) {
+        console.log('current led changed to: ' + newLed);
         led = newLed;
         ledChanged = true;
     }
 }
 
+// Some visual feedback when current LED changes (turn all LEDs to dark green)
 function prepareForNewLed() {
-
+    for(var i = 0; i < strip.length; i++) {
+        strip.pixel( i ).color( FEEDBACK_COLOR );
+    }
+    strip.show();
 }
 
+// Get the current LED from the API
 function lookupNewLed() {
     got(LED_URL)
     .then(response => {
-        console.log("API call finished with response: "+response.body);
+        //console.log("API call finished with response: "+response.body);
         if (response.body) {
             try {
                 temp = new Number(response.body);
-                console.log("Temp: "+temp);
-                if (temp >= 0 && temp <= 173) {
-                    led = temp;
+                //console.log("Temp: "+temp);
+                if (temp >= 0 && temp < strip.length) {
+                    setCurrentLed(temp);
                 }
-                console.log("Temp: "+led);
             } catch (e) {
-                console.log("I caught an error: " + e.message);
+                console.log("Invalid number returned from the API: " + e.message);
             }
         }
     })
@@ -58,8 +64,8 @@ board.on("ready", function() {
     console.log("Board ready");
 
     strip = new pixel.Strip({
-        data: 6,
-        length: 174, // number of pixels in the strip.
+        data: 6,        // This is the Arduino pin we use (D6)
+        length: 174,    // number of pixels in the strip.
         board: this,
         controller: "FIRMATA"
     });
@@ -68,8 +74,9 @@ board.on("ready", function() {
 
         var pixelWasOn = false;
 
-        console.log("LED strip ready event: show 3 colors");
+        console.log("LED strip ready");
 
+        // Turn all LEDs off
         strip.off();
 
         var blinker = setInterval(function() {
@@ -78,20 +85,21 @@ board.on("ready", function() {
 
             if (ledChanged) {
                 prepareForNewLed();
+                ledChanged = false;
+            } else {
+
+                for(var i = 0; i < strip.length; i++) {
+                    strip.pixel(i).off();
+                }
+    
+                if (!pixelWasOn) {
+                    strip.pixel(getCurrentLed()).color( BLINK_COLOR );
+                }
+    
+                strip.show();
+    
+                pixelWasOn = !pixelWasOn;
             }
-
-            for(var i = 0; i < 174; i++) {
-                strip.pixel(i).off();
-            }
-
-            if (!pixelWasOn) {
-                strip.pixel(getCurrentLed()).color("rgb(0, 100, 0)");
-            }
-
-            strip.show();
-
-            //console.log('was on? ' + pixelWasOn);
-            pixelWasOn = !pixelWasOn;
 
         }, 1000/fps);
     });
